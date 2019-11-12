@@ -1,10 +1,10 @@
 import sqlite3
-
-DB_NAME = 'data.db'
+from db_controller import DBController
 
 
 def main():
-    check_db()
+    db = DBController('data.db')
+    check_db(db)
 
     display_welcome_message()
 
@@ -12,9 +12,9 @@ def main():
         cmd = input('Your command > ')
         cmd = cmd.upper()
         if cmd == 'S':
-            show_all_users_info()
+            show_all_users_info(db)
         elif cmd == 'A':
-            add_new_user()
+            add_new_user(db)
         elif cmd == 'Q':
             break
         else:
@@ -23,47 +23,38 @@ def main():
     print('Bye!')
 
 
-def create_table():
-    conn = sqlite3.connect(DB_NAME)
-    cur = conn.cursor()
-    sql = 'create table users(name text, age int)'
-    cur.execute(sql)
-    conn.commit()
-    conn.close()
+def create_table(db: DBController):
+    with db.open():
+        db.execute('create table users(name text, age int)')
+        db.commit()
 
 
-def check_db():
-    conn = sqlite3.connect(DB_NAME)
-    cur = conn.cursor()
-    try:
-        cur.execute('select * from users')
-    except sqlite3.OperationalError:
-        print('Creating new DB')
-        create_table()
-    finally:
-        conn.close()
+def check_db(db):
+    with db.open():
+        try:
+            db.execute('select * from users')
+        except sqlite3.OperationalError:
+            print('Creating new DB')
+            create_table(db)
 
 
-def show_all_users_info():
-    conn = sqlite3.connect(DB_NAME)
-    cur = conn.cursor()
-    sql = 'select * from users'
-    cur.execute(sql)
-    user_records = cur.fetchall()
-    conn.close()
-    for row in user_records:
-        print(f'Name: {row[0]} Age: {row[1]}')
+def show_all_users_info(db):
+    with db.open():
+        sql = 'select * from users'
+        db.execute(sql)
+        user_records = db.fetchall()
+        db.close()
+        for row in user_records:
+            print(f'Name: {row[0]} Age: {row[1]}')
 
 
-def add_new_user():
+def add_new_user(db):
     name = input('New user name > ')
     age = int(input('New user age > '))
-    conn = sqlite3.connect(DB_NAME)
-    cur = conn.cursor()
-    sql = f'insert into users(name, age) values(?, ?)'
-    cur.execute(sql, (name, age))
-    conn.commit()
-    conn.close()
+    with db.open():
+        sql = 'insert into users(name, age) values(?, ?)'
+        db.execute(sql, (name, age))
+        db.commit()
 
 
 def display_welcome_message():
