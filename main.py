@@ -51,8 +51,8 @@ def input_user_name(suffix=''):
 
 
 # ユーザー年齢入力 エラーでNoneを返す
-def input_user_age():
-    str_age = input('New user age > ')
+def input_user_age(suffix=''):
+    str_age = input(f'New user age ({suffix}) > ')
 
     if not str_age.isdigit():
         print('Age is not positive integer')
@@ -173,10 +173,12 @@ def edit_user(db: DBController):
             print(f'Sorry, {user_name} is not found')
             return
 
+        age = user_records[0][1]
+
     new_user_name = input_user_name(user_name)
     if new_user_name is None:
         return
-    new_age = input_user_age()
+    new_age = input_user_age(str(age))
     if new_age is None:
         return
 
