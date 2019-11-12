@@ -72,7 +72,7 @@ def input_user_age():
 
 def create_table(db: DBController):
     with db.open():
-        db.execute('create table users(name text, age int)')
+        db.execute('create table users(name text, age integer)')
         db.commit()
 
 
