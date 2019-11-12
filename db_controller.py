@@ -1,11 +1,13 @@
 import sqlite3
 
 
+# データベースを操作するラッパー
+# with文に対応
 class DBController:
     def __init__(self, db_name: str):
         self.__db_name = db_name
-        self.__connection: sqlite3.Connection = None
-        self.__cursor: sqlite3.Cursor = None
+        self.__connection = None
+        self.__cursor = None
 
     def __enter__(self):
         return self
