@@ -5,7 +5,7 @@ from db_controller import DBController
 def main():
     db = DBController('data.db')
 
-    check_db(db)    #データベースが初期化されてなかったら初期化
+    check_db(db)    # データベースが初期化されてなかったら初期化
 
     display_welcome_message()
 
@@ -37,8 +37,8 @@ def main():
 
 
 # ユーザー名入力 エラーでNoneを返す
-def input_user_name():
-    name = input('New user name > ')
+def input_user_name(suffix=''):
+    name = input(f'New user name ({suffix})> ')
     if len(name) == 0:
         print("User name can't be blank")
         return None
@@ -135,7 +135,7 @@ def find_user(db):
     user_name = input('User name > ')
     sql = 'select * from users where name = ?'
     with db.open():
-        db.execute(sql, [user_name])
+        db.execute(sql, (user_name,))
         user_records = db.fetchall()
     if len(user_records) == 0:
         print(f'Sorry, {user_name} is not found')
@@ -149,14 +149,14 @@ def delete_user(db):
     find_sql = 'select * from users where name = ?'
     delete_sql = 'delete from users where name = ?'
     with db.open():
-        db.execute(find_sql, [user_name])
+        db.execute(find_sql, (user_name,))
         user_records = db.fetchall()
 
         if len(user_records) == 0:
             print(f'Sorry, {user_name} is not found')
             return
 
-        db.execute(delete_sql, [user_name])
+        db.execute(delete_sql, (user_name,))
         db.commit()
         print(f'User {user_name} is deleted')
 
@@ -166,14 +166,14 @@ def edit_user(db: DBController):
     find_sql = 'select * from users where name = ?'
     edit_sql = 'update users set name = ?, age = ? where name = ?'
     with db.open():
-        db.execute(find_sql, [user_name])
+        db.execute(find_sql, (user_name,))
         user_records = db.fetchall()
 
         if len(user_records) == 0:
             print(f'Sorry, {user_name} is not found')
             return
 
-    new_user_name = input_user_name()
+    new_user_name = input_user_name(user_name)
     if new_user_name is None:
         return
     new_age = input_user_age()
